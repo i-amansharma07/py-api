@@ -1,0 +1,158 @@
+* To create python virtual environment --> python3 -m venv .venv
+
+    USED TO ISOLATE THE DEPENDENCIES FOR THE APLLICATION
+
+* migration represents the data structure for the databases.    
+    python manage.py migrate (for creating essential database tables)
+
+* we have admin panel pre built to watch over our models 
+    to access the admin panel --> python3 manage.py createsuperuser
+
+* serializer will help to conver python from the json    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ ** Steps to create the Api **
+1. create directory -> mkdir project_name
+
+2. create an virtual environment -> python3 -m venv .venv 
+    and activate this using . .venv/bin/activate
+
+3. install django in the folder like -> pip insatll django   
+
+4.  create your app in the same directory using -> django-admin startproject pro_name . (current dir)
+    Now test your server by running -> python3 manage.py runserver
+
+5. run python3 manage.py migrate to get the databse tables.(admin panel accessible via urls)
+
+6. run python3 manage.py createsuperuser for admin dashboarda.
+    _________________******************____________________
+
+7. Model :- To create our own table in the database we need models
+            * create new "models.py" in you project dir not folder
+            * get this, from django.db import models
+            * Now create a class say xyz and inherit if from djangoModels class
+                like class xyz(models.Model)
+            * Now you can add atrributes to the table like we have in sql 
+                ex->  fname  =  models.CharField(max_length=50)
+                      lname = models.CharField(max_length=50)  
+
+8. imp : before doing anything else add your app name in the setting.py
+        like ->   INSTALLED_APPS = [
+    'app_name',
+    'django.contrib.admin',
+    .......
+]
+
+
+9. Now after all this we again need to do the migrations as we have added new model
+        run python3 manage.py makemigrations project_name
+        then run python3 manage.py migrate                     
+
+10. as we have made the migration
+     but there will be no change in the admin panel
+     so we will create a new file "admin.py" in app dir
+     and then we register the table in admin :- 
+        from django.contrib import admin
+        from .models import model_name
+
+
+        admin.site.register(model_name)
+
+    ** ADD SOME TABLE IN THE DATABASE VIA ADMIN DASHBOARD **
+   _________________________________________
+
+    **    MODEL IS CREATED NOW WE MAKE SERIALIZER **
+
+ 11. now we are going to create the api for our app
+     install rest framework by running  -> pip install djangorestframework
+
+12. write this in your seetings.py
+        like -> INSTALLED_APPS = [
+    'rest_framework',
+    'app_name',
+    'django.contrib.admin',
+    ...
+]
+
+13. Now create serializer file after this
+        * This file will describe how to go from python object to json
+        steps : 
+            * import serializer from rest_framework like from rest_framework import serializers
+            * now create a class and inherit it from serializer like 
+                class name(serializers.ModelSerializer) 
+            * now create a inner class Meta which will 
+              describe the model of the table we have created   
+            * we need to import our model say "model_xyz"
+              and inside Meta we write
+              model = model_xyz
+            * and we will now write fields beneath it 
+              so we do, from dataclasses import fields
+              and write fields = ['id', 'fname', 'lname']   
+
+ ____________________________________________________________________
+
+    ***    TILL NOW WE HAVE MODEL AND SERIALIZER, NOW WE CRAETE ENDPOINTS ***
+
+ 14.  now we have to return the data via endpoints
+
+ 15. create a new file name "views.py" in app folder
+
+ 16. And we are going to write various functions here which 
+     which will be invoked by the end points 
+     like wwww.aman.com/name
+     so name function will be invoked
+
+    def name(request) :
+    # In this function we need to :
+    # get all the drinks
+    # serialize them 
+    # return json
+      
+ 17. before that we need to import some stuff like
+        * from django.http import JsonResponse to send json data
+
+        * from .models import model_xyz to get the models
+
+        * from .serializers import OfficeSerializers 
+          to serialize the data 
+
+18. inside the function we write 
+
+    -> office = Office.objects.all() "To get all the model objects"
+
+    -> serializer = OfficeSerializers(office, many =True) "To serialize all the offcie objects"
+
+    -> return JsonResponse(serializer.data, safe=False)  "To return the json"
+
+
+____________________________________________________    
+
+    ** WE HAVE EVERYHING MODEL, SERIALIZER AND OUR VIEWS ***
+
+19. Now we just have to tell that which url will hit the function inside the view
+
+20. so we go to urls.py and add our path like :-
+    urlpatterns = [
+        path('admin/', admin.site.urls), # default
+        path('name',views.name, name = 'name'),
+    ]
+
+
+    **** run the server using python3 manage.py runserver and wallaah ****
